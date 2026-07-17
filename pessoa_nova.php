@@ -1,0 +1,207 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["usuario"])) {
+    header("Location: login.php");
+    exit;
+}
+
+include("conexao.php");
+
+if (!isset($_GET["empresa_id"]) || !is_numeric($_GET["empresa_id"])) {
+    header("Location: empresa.php");
+    exit;
+}
+
+$empresa_id = (int)$_GET["empresa_id"];
+
+$stmt = $conn->prepare("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE ID = ?");
+$stmt->bind_param("i", $empresa_id);
+$stmt->execute();
+$empresa = $stmt->get_result()->fetch_assoc();
+
+if (!$empresa) {
+    header("Location: empresa.php");
+    exit;
+}
+
+$cargos = $conn->query("SELECT ID, NOME FROM CARGOS ORDER BY NOME");
+?>
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+<meta charset="UTF-8">
+<title>Nova Pessoa</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    padding:40px;
+}
+.container{
+    background:#fff;
+    max-width:600px;
+    padding:30px;
+    border-radius:8px;
+}
+h1{
+    margin-bottom:20px;
+}
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+}
+input,select{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:4px;
+}
+input[disabled]{
+    background:#f1f5f9;
+    color:#555;
+}
+input[type=file]{
+    padding:8px;
+}
+button{
+    margin-top:25px;
+    padding:10px 20px;
+    background:#0d6efd;
+    color:#fff;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+button:hover{
+    background:#0056d2;
+}
+.btn-voltar{
+    display:inline-block;
+    padding:8px 16px;
+    background:#6c757d;
+    color:#fff;
+    text-decoration:none;
+    border-radius:5px;
+    margin-bottom:20px;
+}
+.btn-voltar:hover{
+    background:#565e64;
+}
+#preview_foto{
+    display:none;
+    margin-top:12px;
+    max-width:200px;
+    max-height:200px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Nova Pessoa</h1>
+
+<a href="pessoas_empresa.php?empresa_id=<?= $empresa_id ?>" class="btn-voltar">
+← Voltar
+</a>
+
+<form method="POST" action="pessoa_salvar.php" enctype="multipart/form-data">
+
+    <input type="hidden" name="empresa_id" value="<?= $empresa_id ?>">
+
+    <label>Empresa</label>
+    <input
+        type="text"
+        value="<?= htmlspecialchars($empresa["NOME_FANTASIA"]) ?>"
+        disabled
+    >
+
+    <label for="cargo_id">Cargo</label>
+    <select id="cargo_id" name="cargo_id">
+        <option value="">Nenhum</option>
+
+        <?php while($cargo = $cargos->fetch_assoc()){ ?>
+
+            <option value="<?= $cargo["ID"] ?>">
+                <?= htmlspecialchars($cargo["NOME"]) ?>
+            </option>
+
+        <?php } ?>
+
+    </select>
+
+    <label for="nome">Nome</label>
+    <input type="text" id="nome" name="nome" required autofocus>
+
+    <label for="cpf">CPF</label>
+    <input type="text" id="cpf" name="cpf" maxlength="11">
+
+    <label for="documento">Documento</label>
+    <input type="text" id="documento" name="documento" maxlength="30">
+
+    <label for="telefone">Telefone</label>
+    <input type="text" id="telefone" name="telefone" maxlength="14">
+
+    <label for="ingresso_permanente">Ingresso Permanente</label>
+    <select id="ingresso_permanente" name="ingresso_permanente">
+        <option value="N">Não</option>
+        <option value="S">Sim</option>
+    </select>
+
+    <label for="foto">Foto</label>
+    <input
+        type="file"
+        id="foto"
+        name="foto"
+        accept="image/*"
+        onchange="mostrarPreview(this)"
+    >
+
+    <img id="preview_foto">
+
+    <button type="submit">Salvar</button>
+
+</form>
+
+</div>
+
+<script>
+function mostrarPreview(input){
+
+    const preview = document.getElementById("preview_foto");
+
+    if(input.files && input.files[0]){
+
+        const leitor = new FileReader();
+
+        leitor.onload = function(e){
+
+            preview.src = e.target.result;
+            preview.style.display = "block";
+
+        };
+
+        leitor.readAsDataURL(input.files[0]);
+
+    }else{
+
+        preview.style.display = "none";
+
+    }
+
+}
+</script>
+
+</body>
+</html>
