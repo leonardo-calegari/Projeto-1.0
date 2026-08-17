@@ -7,6 +7,10 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("funcoes_limite.php");
+
+$categoria_id = intval($_SESSION["categoria_id"]);
+$is_admin     = ($categoria_id == 1);
 
 if (!isset($_GET["empresa_id"]) || !is_numeric($_GET["empresa_id"])) {
     header("Location: empresa.php");
@@ -14,6 +18,12 @@ if (!isset($_GET["empresa_id"]) || !is_numeric($_GET["empresa_id"])) {
 }
 
 $empresa_id = (int) $_GET["empresa_id"];
+
+// Funcionário/Expositor só podem ver a própria empresa,
+// mesmo que tentem trocar o empresa_id na URL
+if (!$is_admin) {
+    $empresa_id = intval($_SESSION["empresa_id"]);
+}
 
 $stmtEmpresa = $conn->prepare("SELECT * FROM EMPRESAS WHERE ID = ?");
 $stmtEmpresa->bind_param("i", $empresa_id);
@@ -33,7 +43,7 @@ $sqlBase = "SELECT P.*, E.NOME_FANTASIA, C.NOME AS NOME_CARGO
         FROM PESSOAS P
         INNER JOIN EMPRESAS E ON E.ID = P.EMPRESA_ID
         LEFT JOIN CARGOS C ON C.ID = P.CARGO_ID
-        WHERE P.EMPRESA_ID = ?";
+        WHERE P.EMPRESA_ID = ? AND P.EXCLUIDO_EM IS NULL";
 
 if ($busca !== "") {
     $sql = $sqlBase . "
@@ -54,6 +64,13 @@ if ($busca !== "") {
     $stmt->execute();
     $result = $stmt->get_result();
 }
+
+$limiteInfo    = obterLimitePessoas($conn, $empresa_id);
+$temLimite     = $limiteInfo["limite"] > 0;
+$limiteAtingido = $temLimite && $limiteInfo["total"] >= $limiteInfo["limite"];
+
+// Categoria 3 (Expositor) não pode nem clicar em Nova Pessoa quando atingir o limite
+$bloquearBotaoNovo = ($categoria_id == 3) && $limiteAtingido;
 
 $titulo_pagina = "Pessoas - " . $empresa["NOME_FANTASIA"];
 include("cabecalho.php");
@@ -84,6 +101,12 @@ include("cabecalho.php");
     border: none;
 }
 .toolbar-lista .botao:hover { background: #1d4ed8; }
+.toolbar-lista .botao.desabilitado {
+    background: #cbd5e1;
+    color: #64748b;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 .form-pesquisa {
     display: flex;
     align-items: center;
@@ -128,6 +151,24 @@ include("cabecalho.php");
     color: #475569;
     margin: 8px 0;
 }
+.contagem-limite {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 8px 0;
+    color: #475569;
+}
+.contagem-limite.atingido {
+    color: #b91c1c;
+}
+.aviso-limite {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin: 8px 0 16px;
+}
 </style>
 
 <h1>Pessoas — <?= htmlspecialchars($empresa["NOME_FANTASIA"]) ?></h1>
@@ -135,7 +176,12 @@ include("cabecalho.php");
 <div class="toolbar-lista">
     <div class="grupo-esquerda">
         <a href="empresa.php" class="btn-voltar">← Voltar</a>
-        <a class="botao" href="pessoa_nova.php?empresa_id=<?= $empresa_id ?>">+ Nova Pessoa</a>
+
+        <?php if ($bloquearBotaoNovo) { ?>
+            <span class="botao desabilitado" title="Limite de pessoas atingido">+ Nova Pessoa</span>
+        <?php } else { ?>
+            <a class="botao" href="pessoa_nova.php?empresa_id=<?= $empresa_id ?>">+ Nova Pessoa</a>
+        <?php } ?>
     </div>
 
     <form method="GET" action="pessoas_empresa.php" class="form-pesquisa">
@@ -155,6 +201,23 @@ include("cabecalho.php");
 
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
 <div class="contagem-registros"><?= $totalRegistros ?> registro<?= $totalRegistros == 1 ? "" : "s" ?></div>
+
+<?php if ($temLimite) { ?>
+    <div class="contagem-limite <?= $limiteAtingido ? "atingido" : "" ?>">
+        <?= $limiteInfo["total"] ?> de <?= $limiteInfo["limite"] ?> pessoas cadastradas
+    </div>
+<?php } ?>
+
+<?php if ($limiteAtingido) { ?>
+    <div class="aviso-limite">
+        Limite de pessoas atingido para esta empresa.
+        <?php if ($categoria_id == 2) { ?>
+            Para cadastrar mais pessoas, será necessária a autorização de um administrador.
+        <?php } elseif ($categoria_id == 3) { ?>
+            Não é possível cadastrar novas pessoas até que o limite seja liberado por um administrador.
+        <?php } ?>
+    </div>
+<?php } ?>
 
 <table>
     <tr>

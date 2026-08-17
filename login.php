@@ -8,7 +8,7 @@ if (isset($_POST["entrar"])) {
     $email = trim(strip_tags($_POST["email"]));
     $senha = md5(trim($_POST["senha"]));
 
-    $sql  = "SELECT nome FROM usuarios WHERE email = ? AND senha = ?";
+    $sql  = "SELECT ID, NOME, CATEGORIA_ID, EMPRESA_ID FROM usuarios WHERE email = ? AND senha = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $email, $senha);
     $stmt->execute();
@@ -16,7 +16,12 @@ if (isset($_POST["entrar"])) {
 
     if ($result && $result->num_rows == 1) {
         $dados = $result->fetch_assoc();
-        $_SESSION["usuario"] = $dados["nome"];
+
+        $_SESSION["usuario"]      = $dados["NOME"];
+        $_SESSION["usuario_id"]   = $dados["ID"];
+        $_SESSION["categoria_id"] = $dados["CATEGORIA_ID"];
+        $_SESSION["empresa_id"]   = $dados["EMPRESA_ID"];
+
         header("Location: paginainicial.php");
         exit;
     }

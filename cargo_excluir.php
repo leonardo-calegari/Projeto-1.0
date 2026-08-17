@@ -8,10 +8,29 @@ if (!isset($_SESSION["usuario"])) {
 
 include("conexao.php");
 
+$categoria_id = intval($_SESSION["categoria_id"]);
+$is_admin     = ($categoria_id == 1);
+
 $id = intval($_GET["id"]);
 
 if ($id <= 0) {
     die("ID inválido.");
+}
+
+if (!$is_admin) {
+    // Funcionário/Expositor só pode excluir cargo da própria empresa
+    $stmtAtual = $conn->prepare("SELECT ID_EMPRESA FROM CARGOS WHERE ID = ?");
+    $stmtAtual->bind_param("i", $id);
+    $stmtAtual->execute();
+    $cargoAtual = $stmtAtual->get_result()->fetch_assoc();
+
+    if (!$cargoAtual) {
+        die("Cargo não encontrado.");
+    }
+
+    if ($cargoAtual["ID_EMPRESA"] != intval($_SESSION["empresa_id"])) {
+        die("Você não tem permissão para excluir este cargo.");
+    }
 }
 
 $sql  = "DELETE FROM CARGOS WHERE ID = ?";

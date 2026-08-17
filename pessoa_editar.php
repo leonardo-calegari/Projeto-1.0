@@ -8,6 +8,9 @@ if (!isset($_SESSION["usuario"])) {
 
 include("conexao.php");
 
+$categoria_id = intval($_SESSION["categoria_id"]);
+$is_admin     = ($categoria_id == 1);
+
 $id = intval($_GET["id"]);
 
 if ($id <= 0) {
@@ -26,8 +29,20 @@ if ($result->num_rows == 0) {
 
 $pessoa = $result->fetch_assoc();
 
-$empresas = $conn->query("SELECT ID, NOME_FANTASIA FROM EMPRESAS ORDER BY NOME_FANTASIA");
-$cargos   = $conn->query("SELECT ID, NOME FROM CARGOS ORDER BY NOME");
+// Funcionário/Expositor só podem editar pessoas da própria empresa
+if (!$is_admin && $pessoa["EMPRESA_ID"] != intval($_SESSION["empresa_id"])) {
+    die("Você não tem permissão para editar esta pessoa.");
+}
+
+if ($is_admin) {
+    $empresas = $conn->query("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE EXCLUIDO_EM IS NULL ORDER BY NOME_FANTASIA");
+}
+
+// Cargos: só os cadastrados para a empresa da pessoa
+$stmtCargos = $conn->prepare("SELECT ID, NOME FROM CARGOS WHERE ID_EMPRESA = ? ORDER BY NOME");
+$stmtCargos->bind_param("i", $pessoa["EMPRESA_ID"]);
+$stmtCargos->execute();
+$cargos = $stmtCargos->get_result();
 
 $temFoto = !empty($pessoa["FOTO"]);
 ?>
@@ -48,6 +63,7 @@ h1{ margin-bottom:15px; }
 form{ margin-top:20px; }
 label{ display:block; margin-top:15px; font-weight:bold; }
 input, select{ width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
+input[disabled]{ background:#f1f5f9; color:#555; }
 input[type="file"]{ padding:8px; }
 button{ margin-top:20px; padding:10px 20px; background:#0d6efd; color:white; border:none; border-radius:5px; cursor:pointer; }
 button:hover{ background:#0056d2; }
@@ -69,22 +85,28 @@ button:hover{ background:#0056d2; }
 
 <h1>Editar Pessoa</h1>
 
-<a class="voltar" href="pessoas.php">← Voltar</a>
+<a class="voltar" href="pessoas_empresa.php?empresa_id=<?= $pessoa["EMPRESA_ID"] ?>">← Voltar</a>
 
 <form method="POST" action="pessoa_atualizar.php" enctype="multipart/form-data">
 
     <input type="hidden" name="id" value="<?= $pessoa["ID"] ?>">
     <input type="hidden" name="foto_atual" value="<?= htmlspecialchars($pessoa["FOTO"]) ?>">
 
-    <label for="empresa_id">Empresa</label>
-    <select id="empresa_id" name="empresa_id" required>
-        <option value="">Selecione...</option>
-        <?php while ($emp = $empresas->fetch_assoc()) { ?>
-            <option value="<?= $emp["ID"] ?>" <?= $emp["ID"] == $pessoa["EMPRESA_ID"] ? "selected" : "" ?>>
-                <?= htmlspecialchars($emp["NOME_FANTASIA"]) ?>
-            </option>
-        <?php } ?>
-    </select>
+    <?php if ($is_admin) { ?>
+        <label for="empresa_id">Empresa</label>
+        <select id="empresa_id" name="empresa_id" required onchange="atualizarCargos(this.value)">
+            <option value="">Selecione...</option>
+            <?php while ($emp = $empresas->fetch_assoc()) { ?>
+                <option value="<?= $emp["ID"] ?>" <?= $emp["ID"] == $pessoa["EMPRESA_ID"] ? "selected" : "" ?>>
+                    <?= htmlspecialchars($emp["NOME_FANTASIA"]) ?>
+                </option>
+            <?php } ?>
+        </select>
+    <?php } else { ?>
+        <label>Empresa</label>
+        <input type="hidden" name="empresa_id" value="<?= $pessoa["EMPRESA_ID"] ?>">
+        <input type="text" value="<?= htmlspecialchars($_SESSION["usuario"]) ?>" disabled>
+    <?php } ?>
 
     <label for="cargo_id">Cargo</label>
     <select id="cargo_id" name="cargo_id">
@@ -139,6 +161,14 @@ function mostrarPreview(input) {
     }
     // Se o usuário cancelar a seleção, mantém a foto atual (não esconde o preview)
 }
+
+<?php if ($is_admin) { ?>
+function atualizarCargos(empresaId) {
+    // Ao trocar a empresa, o cargo selecionado pode não pertencer mais a ela.
+    // Aqui apenas avisamos; o filtro real de cargos por empresa é feito no backend.
+    // (Opcional: implementar via AJAX uma busca dinâmica dos cargos da nova empresa.)
+}
+<?php } ?>
 </script>
 
 </body>
