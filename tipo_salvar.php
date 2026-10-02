@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("funcoes_log.php");
 
 $nome             = trim(strip_tags($_POST["nome"]));
 $controla_espacos = trim(strip_tags($_POST["controla_espacos"]));
@@ -24,6 +25,7 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("ss", $nome, $controla_espacos);
 
 if ($stmt->execute()) {
+    registrarLog("INCLUSAO", "TIPOS", dadosLog(buscarRegistro($conn, "TIPOS", $conn->insert_id)));
     header("Location: tipos.php");
     exit;
 } else {

@@ -117,6 +117,9 @@ th{ background:#f0f0f0; }
         <a href="empresa.php" class="<?= $pagina_atual === 'empresa.php' ? 'ativo' : '' ?>">EMPRESAS</a>
         <a href="pessoas.php" class="<?= $pagina_atual === 'pessoas.php' ? 'ativo' : '' ?>">PESSOAS</a>
         <a href="cargos.php" class="<?= $pagina_atual === 'cargos.php' ? 'ativo' : '' ?>">CARGOS</a>
+        <?php if (($_SESSION["perfil"] ?? "") === "admin") { ?>
+        <a href="logs.php" class="<?= $pagina_atual === 'logs.php' ? 'ativo' : '' ?>">LOGS</a>
+        <?php } ?>
     </aside>
 
     <main>
