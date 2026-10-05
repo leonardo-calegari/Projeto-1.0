@@ -8,6 +8,9 @@ if (!isset($_SESSION["usuario"])) {
 
 include("conexao.php");
 
+// Categoria do usuário logado (1 = admin, 2 = funcionário, 3 = expositor)
+$categoriaLogado = (int)($_SESSION["categoria_id"] ?? 0);
+
 $busca = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
 
 if ($busca !== "") {
@@ -100,15 +103,18 @@ include("cabecalho.php");
 }
 </style>
 
+<h1>Empresas</h1>
+
 <div class="toolbar-lista">
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
 
-        <?php if (($_SESSION["categoria_id"] ?? 0) == 1) { ?>
+        <?php if ($categoriaLogado === 1) { ?>
             <a href="importar_empresas.php" class="botao">Importar</a>
         <?php } ?>
     </div>
+
     <form method="GET" action="empresa.php" class="form-pesquisa">
         <input type="text" name="busca" class="input-pesquisa" placeholder="Pesquisar..." value="<?= htmlspecialchars($busca) ?>">
         <button type="submit" class="btn-pesquisar" title="Pesquisar">
