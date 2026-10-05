@@ -104,7 +104,7 @@ include("cabecalho.php");
 </style>
 
 <h1>Empresas</h1>
-
+<pre><?php var_dump($_SESSION); ?></pre>
 <div class="toolbar-lista">
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
