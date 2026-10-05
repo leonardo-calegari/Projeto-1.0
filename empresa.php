@@ -101,7 +101,7 @@ include("cabecalho.php");
 </style>
 
 <h1>Empresas</h1>
-
+   <p style="color:red;font-weight:bold;">TESTE 123</p>
 <div class="toolbar-lista">
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
