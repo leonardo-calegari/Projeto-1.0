@@ -106,6 +106,13 @@ include("cabecalho.php");
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
+
+<a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
+
+<?php if (($_SESSION["categoria_id"] ?? 0) == 1) { ?>
+    <a href="importar_empresas.php" class="botao">Importar</a>
+<?php } ?>
+
     </div>
 
     <form method="GET" action="empresa.php" class="form-pesquisa">
