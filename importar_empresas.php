@@ -18,6 +18,7 @@ if ($categoriaLogado !== 1) {
 }
 
 include("conexao.php");
+include_once("funcoes_log.php");
 
 const ANO_FIXO = 2026;
 
@@ -85,11 +86,14 @@ function importarEmpresas(mysqli $conn, string $caminho, int $usuarioId): array
             $stmt->execute();
             $inseridas++;
 
-            if (function_exists("writeRegistroLog")) {
-                writeRegistroLog(
-                    $usuarioId . ";INCLUSAO;EMPRESAS;" . date("Y-m-d H:i:s") . ";" .
-                    "ID=" . $conn->insert_id . ",NOME_FANTASIA=$fantasia,RAZAO_SOCIAL=$razao,TIPO_ID=$tipoId (importação)"
-                );
+            if (function_exists("registrarLog")) {
+                registrarLog("INCLUSAO", "EMPRESAS", dadosLog([
+                    "ID"            => $conn->insert_id,
+                    "NOME_FANTASIA" => $fantasia,
+                    "RAZAO_SOCIAL"  => $razao,
+                    "TIPO_ID"       => $tipoId,
+                    "ORIGEM"        => "importacao",
+                ]));
             }
         }
         $conn->commit();
