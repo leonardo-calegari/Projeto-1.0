@@ -107,16 +107,13 @@ include("cabecalho.php");
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
 
-
-
-    </div>
-
 <a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
 
 <?php if (($_SESSION["categoria_id"] ?? 0) == 1) { ?>
     <a href="importar_empresas.php" class="botao">Importar</a>
 <?php } ?>
 
+    </div>
     <form method="GET" action="empresa.php" class="form-pesquisa">
         <input type="text" name="busca" class="input-pesquisa" placeholder="Pesquisar..." value="<?= htmlspecialchars($busca) ?>">
         <button type="submit" class="btn-pesquisar" title="Pesquisar">
