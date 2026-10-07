@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("permissoes.php"); // define $categoriaLogado e funções ehAdmin() etc.
 
 $busca = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
 
@@ -106,6 +107,10 @@ include("cabecalho.php");
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
+
+        <?php if (ehAdmin()) { ?>
+            <a href="importar_empresas.php" class="botao">Importar</a>
+        <?php } ?>
     </div>
 
     <form method="GET" action="empresa.php" class="form-pesquisa">
