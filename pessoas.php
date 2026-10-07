@@ -156,11 +156,7 @@ include("cabecalho.php");
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
 
-        <?php if ($filtro_emp > 0) { ?>
-            <a class="botao" href="pessoa_nova.php?empresa_id=<?= $filtro_emp ?>">+ Nova Pessoa</a>
-        <?php } else { ?>
-            <span class="botao desabilitado" title="Selecione uma empresa no filtro para cadastrar">+ Nova Pessoa</span>
-        <?php } ?>
+        <a class="botao" href="pessoa_nova.php<?= $filtro_emp > 0 ? '?empresa_id=' . $filtro_emp : '' ?>">+ Nova Pessoa</a>
     </div>
 
     <form method="GET" action="pessoas.php" class="form-pesquisa">
