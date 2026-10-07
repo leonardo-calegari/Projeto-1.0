@@ -6,19 +6,15 @@ if (!isset($_SESSION["usuario"])) {
     exit;
 }
 
-// ---- AJUSTE AQUI se os nomes na sua sessão forem outros -------------------
-$categoriaLogado = (int)($_SESSION["categoria_id"] ?? 0);
-$usuarioLogadoId = (int)($_SESSION["usuario_id"] ?? 0);
-// ---------------------------------------------------------------------------
+include("conexao.php");
+include("permissoes.php");
+include_once("funcoes_log.php");
 
 // Somente administrador (categoria 1)
-if ($categoriaLogado !== 1) {
+if (!ehAdmin()) {
     http_response_code(403);
     exit("Acesso negado.");
 }
-
-include("conexao.php");
-include_once("funcoes_log.php");
 
 const ANO_FIXO = 2026;
 

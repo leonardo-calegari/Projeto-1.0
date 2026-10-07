@@ -7,9 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
-
-// Categoria do usuário logado (1 = admin, 2 = funcionário, 3 = expositor)
-$categoriaLogado = (int)($_SESSION["categoria_id"] ?? 0);
+include("permissoes.php"); // define $categoriaLogado e funções ehAdmin() etc.
 
 $busca = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
 
@@ -104,13 +102,13 @@ include("cabecalho.php");
 </style>
 
 <h1>Empresas</h1>
-<pre><?php var_dump($_SESSION); ?></pre>
+
 <div class="toolbar-lista">
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="empresa_nova.php" class="botao">+ Nova Empresa</a>
 
-        <?php if ($categoriaLogado === 1) { ?>
+        <?php if (ehAdmin()) { ?>
             <a href="importar_empresas.php" class="botao">Importar</a>
         <?php } ?>
     </div>
