@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 if (!isset($_SESSION["usuario"])) {
@@ -150,6 +149,7 @@ include("cabecalho.php");
                 <td>
                     <a href="empresa_editar.php?id=<?= $row["ID"] ?>">Editar</a> |
                     <a href="pessoas_empresa.php?empresa_id=<?= $row["ID"] ?>">Usuários</a> |
+                    <a href="importar_pessoas.php?empresa_id=<?= $row["ID"] ?>">Importar pessoas</a> |
                     <a href="empresa_excluir.php?id=<?= $row["ID"] ?>" onclick="return confirm('Excluir?')">Excluir</a>
                 </td>
             </tr>
