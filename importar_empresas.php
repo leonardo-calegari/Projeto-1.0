@@ -1,5 +1,4 @@
 <?php
-die("ARQUIVO CERTO");
 session_start();
 
 if (!isset($_SESSION["usuario"])) {
