@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("funcoes_log.php");
 
 $id = intval($_GET["id"]);
 
@@ -14,11 +15,15 @@ if ($id <= 0) {
     die("ID inválido.");
 }
 
+$antigo = buscarRegistro($conn, "TIPOS", $id);
+
 $sql  = "DELETE FROM TIPOS WHERE ID = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
+    registrarLog("EXCLUSAO", "TIPOS", dadosLog($antigo));
+
     header("Location: tipos.php");
     exit;
 } else {

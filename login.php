@@ -1,22 +1,59 @@
 <?php
 session_start();
 include("conexao.php");
+include("funcoes_log.php");
 
-$erro = "";
+// Já está logado: vai direto para a página inicial
+if (isset($_SESSION["usuario"])) {
+    header("Location: paginainicial.php");
+    exit;
+}
+
+$erro  = "";
+$email = "";
 
 if (isset($_POST["entrar"])) {
     $email = trim(strip_tags($_POST["email"]));
     $senha = md5(trim($_POST["senha"]));
 
-    $sql  = "SELECT nome FROM usuarios WHERE email = ? AND senha = ?";
+    $sql  = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $email, $senha);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result && $result->num_rows == 1) {
-        $dados = $result->fetch_assoc();
-        $_SESSION["usuario"] = $dados["nome"];
+        // chaves em minúsculo, para não depender de como a coluna foi criada
+        $dados = array_change_key_case($result->fetch_assoc(), CASE_LOWER);
+
+        // Categoria: usa categoria_id se existir; senão tenta pelo perfil
+        // 1 = administrador, 2 = funcionário, 3 = expositor
+        $perfil    = $dados["perfil"] ?? "";
+        $categoria = $dados["categoria_id"] ?? null;
+
+        if ($categoria === null || $categoria === "") {
+            $mapa = [
+                "admin"       => 1,
+                "administrador" => 1,
+                "funcionario" => 2,
+                "funcionário" => 2,
+                "expositor"   => 3,
+            ];
+            $categoria = is_numeric($perfil)
+                ? (int)$perfil
+                : ($mapa[mb_strtolower($perfil)] ?? 0);
+        }
+
+        session_regenerate_id(true);
+
+        $_SESSION["usuario"]      = $dados["nome"];
+        $_SESSION["usuario_id"]   = $dados["id"];
+        $_SESSION["perfil"]       = $perfil;
+        $_SESSION["categoria_id"] = (int)$categoria;
+        $_SESSION["empresa_id"]   = $dados["empresa_id"] ?? null;
+
+        registrarLog("LOGIN", "LOGIN", dadosLog(["EMAIL" => $email]));
+
         header("Location: paginainicial.php");
         exit;
     }
@@ -30,6 +67,7 @@ if (isset($_POST["entrar"])) {
 
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Login</title>
 
 <style>
@@ -95,10 +133,10 @@ button:hover{
 <h2>LOGIN</h2>
 
 <?php if ($erro != "") { ?>
-<p class="erro"><?= $erro ?></p>
+<p class="erro"><?= htmlspecialchars($erro) ?></p>
 <?php } ?>
 
-<input type="email" name="email" placeholder="Email" required autofocus>
+<input type="email" name="email" placeholder="Email" value="<?= htmlspecialchars($email) ?>" required autofocus>
 
 <input type="password" name="senha" placeholder="Senha" required>
 

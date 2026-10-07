@@ -7,6 +7,10 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("funcoes_limite.php");
+
+$categoria_id = intval($_SESSION["categoria_id"]);
+$is_admin     = ($categoria_id == 1);
 
 if (!isset($_GET["empresa_id"]) || !is_numeric($_GET["empresa_id"])) {
     header("Location: empresa.php");
@@ -14,6 +18,12 @@ if (!isset($_GET["empresa_id"]) || !is_numeric($_GET["empresa_id"])) {
 }
 
 $empresa_id = (int)$_GET["empresa_id"];
+
+// Funcionário/Expositor só podem cadastrar na própria empresa,
+// mesmo que tentem trocar o empresa_id na URL
+if (!$is_admin) {
+    $empresa_id = intval($_SESSION["empresa_id"]);
+}
 
 $stmt = $conn->prepare("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE ID = ?");
 $stmt->bind_param("i", $empresa_id);
@@ -25,7 +35,21 @@ if (!$empresa) {
     exit;
 }
 
-$cargos = $conn->query("SELECT ID, NOME FROM CARGOS ORDER BY NOME");
+// Cargos disponíveis: só os cadastrados para essa empresa
+$stmtCargos = $conn->prepare("SELECT ID, NOME FROM CARGOS WHERE ID_EMPRESA = ? ORDER BY NOME");
+$stmtCargos->bind_param("i", $empresa_id);
+$stmtCargos->execute();
+$cargos = $stmtCargos->get_result();
+
+$limiteInfo     = obterLimitePessoas($conn, $empresa_id);
+$temLimite      = $limiteInfo["limite"] > 0;
+$limiteAtingido = $temLimite && $limiteInfo["total"] >= $limiteInfo["limite"];
+
+// Categoria 3 (Expositor): formulário bloqueado ao atingir o limite
+$formBloqueado = ($categoria_id == 3) && $limiteAtingido;
+
+// Categoria 2 (Funcionário): precisa de autorização de um Admin ao atingir o limite
+$precisaAutorizacao = ($categoria_id == 2) && $limiteAtingido;
 ?>
 
 <!DOCTYPE html>
@@ -82,6 +106,11 @@ button{
 button:hover{
     background:#0056d2;
 }
+button[disabled]{
+    background:#cbd5e1;
+    color:#64748b;
+    cursor:not-allowed;
+}
 .btn-voltar{
     display:inline-block;
     padding:8px 16px;
@@ -102,6 +131,36 @@ button:hover{
     border-radius:6px;
     border:1px solid #ccc;
 }
+.contagem-limite{
+    font-size:14px;
+    font-weight:600;
+    color:#475569;
+    margin:6px 0 16px;
+}
+.contagem-limite.atingido{
+    color:#b91c1c;
+}
+.aviso-limite{
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#b91c1c;
+    padding:10px 14px;
+    border-radius:6px;
+    font-size:14px;
+    margin-bottom:16px;
+}
+.autorizacao{
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    border-radius:6px;
+    padding:16px;
+    margin-top:20px;
+}
+.autorizacao p{
+    font-size:13px;
+    color:#92400e;
+    margin-bottom:6px;
+}
 </style>
 
 </head>
@@ -116,63 +175,101 @@ button:hover{
 ← Voltar
 </a>
 
-<form method="POST" action="pessoa_salvar.php" enctype="multipart/form-data">
+<?php if ($temLimite) { ?>
+    <div class="contagem-limite <?= $limiteAtingido ? "atingido" : "" ?>">
+        <?= $limiteInfo["total"] ?> de <?= $limiteInfo["limite"] ?> pessoas cadastradas
+    </div>
+<?php } ?>
 
-    <input type="hidden" name="empresa_id" value="<?= $empresa_id ?>">
+<?php if ($formBloqueado) { ?>
 
-    <label>Empresa</label>
-    <input
-        type="text"
-        value="<?= htmlspecialchars($empresa["NOME_FANTASIA"]) ?>"
-        disabled
-    >
+    <div class="aviso-limite">
+        O limite de pessoas desta empresa foi atingido. Não é possível cadastrar novas pessoas
+        até que um administrador libere o limite.
+    </div>
 
-    <label for="cargo_id">Cargo</label>
-    <select id="cargo_id" name="cargo_id">
-        <option value="">Nenhum</option>
+<?php } else { ?>
 
-        <?php while($cargo = $cargos->fetch_assoc()){ ?>
+    <?php if ($limiteAtingido) { ?>
+        <div class="aviso-limite">
+            O limite de pessoas desta empresa foi atingido.
+            <?php if ($precisaAutorizacao) { ?>
+                Informe abaixo o email e a senha de um administrador para liberar este cadastro.
+            <?php } ?>
+        </div>
+    <?php } ?>
 
-            <option value="<?= $cargo["ID"] ?>">
-                <?= htmlspecialchars($cargo["NOME"]) ?>
-            </option>
+    <form method="POST" action="pessoa_salvar.php" enctype="multipart/form-data">
 
+        <input type="hidden" name="empresa_id" value="<?= $empresa_id ?>">
+
+        <label>Empresa</label>
+        <input
+            type="text"
+            value="<?= htmlspecialchars($empresa["NOME_FANTASIA"]) ?>"
+            disabled
+        >
+
+        <label for="cargo_id">Cargo</label>
+        <select id="cargo_id" name="cargo_id">
+            <option value="">Nenhum</option>
+
+            <?php while($cargo = $cargos->fetch_assoc()){ ?>
+
+                <option value="<?= $cargo["ID"] ?>">
+                    <?= htmlspecialchars($cargo["NOME"]) ?>
+                </option>
+
+            <?php } ?>
+
+        </select>
+
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" required autofocus>
+
+        <label for="cpf">CPF</label>
+        <input type="text" id="cpf" name="cpf" maxlength="11">
+
+        <label for="documento">Documento</label>
+        <input type="text" id="documento" name="documento" maxlength="30">
+
+        <label for="telefone">Telefone</label>
+        <input type="text" id="telefone" name="telefone" maxlength="14">
+
+        <label for="ingresso_permanente">Ingresso Permanente</label>
+        <select id="ingresso_permanente" name="ingresso_permanente">
+            <option value="N">Não</option>
+            <option value="S">Sim</option>
+        </select>
+
+        <label for="foto">Foto</label>
+        <input
+            type="file"
+            id="foto"
+            name="foto"
+            accept="image/*"
+            onchange="mostrarPreview(this)"
+        >
+
+        <img id="preview_foto">
+
+        <?php if ($precisaAutorizacao) { ?>
+            <div class="autorizacao">
+                <p>Autorização de administrador necessária (limite atingido)</p>
+
+                <label for="admin_email">Email do administrador</label>
+                <input type="email" id="admin_email" name="admin_email" required>
+
+                <label for="admin_senha">Senha do administrador</label>
+                <input type="password" id="admin_senha" name="admin_senha" required>
+            </div>
         <?php } ?>
 
-    </select>
+        <button type="submit">Salvar</button>
 
-    <label for="nome">Nome</label>
-    <input type="text" id="nome" name="nome" required autofocus>
+    </form>
 
-    <label for="cpf">CPF</label>
-    <input type="text" id="cpf" name="cpf" maxlength="11">
-
-    <label for="documento">Documento</label>
-    <input type="text" id="documento" name="documento" maxlength="30">
-
-    <label for="telefone">Telefone</label>
-    <input type="text" id="telefone" name="telefone" maxlength="14">
-
-    <label for="ingresso_permanente">Ingresso Permanente</label>
-    <select id="ingresso_permanente" name="ingresso_permanente">
-        <option value="N">Não</option>
-        <option value="S">Sim</option>
-    </select>
-
-    <label for="foto">Foto</label>
-    <input
-        type="file"
-        id="foto"
-        name="foto"
-        accept="image/*"
-        onchange="mostrarPreview(this)"
-    >
-
-    <img id="preview_foto">
-
-    <button type="submit">Salvar</button>
-
-</form>
+<?php } ?>
 
 </div>
 

@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("funcoes_log.php");
 
 $id               = intval($_POST["id"]);
 $nome             = trim(strip_tags($_POST["nome"]));
@@ -20,11 +21,16 @@ if (!in_array($controla_espacos, ["S", "N"])) {
     die("Valor inválido para controla espaços.");
 }
 
+$antigo = buscarRegistro($conn, "TIPOS", $id);
+
 $sql  = "UPDATE TIPOS SET NOME = ?, CONTROLA_ESPACOS = ? WHERE ID = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("ssi", $nome, $controla_espacos, $id);
 
 if ($stmt->execute()) {
+    $novo = buscarRegistro($conn, "TIPOS", $id);
+    registrarLog("ALTERACAO", "TIPOS", dadosLog($antigo) . ";" . dadosLog($novo));
+
     header("Location: tipos.php");
     exit;
 } else {
