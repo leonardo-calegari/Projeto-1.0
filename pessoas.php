@@ -148,6 +148,18 @@ include("cabecalho.php");
     color: #475569;
     margin: 8px 0;
 }
+
+.botao-tabela {
+    background: #2563eb;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+}
+.botao-tabela:hover { background: #1d4ed8; }
 </style>
 
 <h1>Pessoas</h1>
@@ -158,7 +170,9 @@ include("cabecalho.php");
 
         <a class="botao" href="pessoa_nova.php<?= $filtro_emp > 0 ? '?empresa_id=' . $filtro_emp : '' ?>">+ Nova Pessoa</a>
 
-<a href="importar_pessoas.php?empresa_id=<?= $row["ID"] ?>">Importar pessoas</a> |
+<a href="importar_pessoas.php?empresa_id=<?= $row["ID"] ?>" class="botao-tabela">Importar pessoas</a> |
+
+<a href="relatorio_pessoas.php?empresa_id=<?= $filtro_emp ?>&busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
 
     </div>
 
