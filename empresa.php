@@ -111,6 +111,9 @@ include("cabecalho.php");
         <?php if (ehAdmin()) { ?>
             <a href="importar_empresas.php" class="botao">Importar</a>
         <?php } ?>
+
+         <a href="relatorio_empresas.php?busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
+
     </div>
 
     <form method="GET" action="empresa.php" class="form-pesquisa">

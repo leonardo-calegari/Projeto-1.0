@@ -157,6 +157,9 @@ include("cabecalho.php");
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
 
         <a class="botao" href="pessoa_nova.php<?= $filtro_emp > 0 ? '?empresa_id=' . $filtro_emp : '' ?>">+ Nova Pessoa</a>
+
+<a href="importar_pessoas.php?empresa_id=<?= $row["ID"] ?>">Importar pessoas</a> |
+
     </div>
 
     <form method="GET" action="pessoas.php" class="form-pesquisa">
