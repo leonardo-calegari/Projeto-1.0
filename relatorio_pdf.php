@@ -13,10 +13,21 @@ use Dompdf\Options;
  */
 function gerarRelatorioPdf(string $titulo, array $colunas, array $linhas, string $filtro = "", string $arquivo = "relatorio.pdf"): void
 {
-    $autoload = __DIR__ . "/vendor/autoload.php";
-    if (!file_exists($autoload)) {
+    // Procura a pasta vendor nesta pasta e nas pastas de cima
+    $autoload = null;
+    $dir = __DIR__;
+    for ($i = 0; $i < 5; $i++) {
+        if (file_exists($dir . "/vendor/autoload.php")) {
+            $autoload = $dir . "/vendor/autoload.php";
+            break;
+        }
+        $pai = dirname($dir);
+        if ($pai === $dir) break;
+        $dir = $pai;
+    }
+    if ($autoload === null) {
         http_response_code(500);
-        exit("Biblioteca de PDF não instalada. No terminal, dentro da pasta do projeto, rode: composer require dompdf/dompdf");
+        exit("Biblioteca de PDF não encontrada. No terminal, dentro da pasta do projeto, rode: composer install");
     }
     require_once $autoload;
 
