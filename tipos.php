@@ -9,7 +9,7 @@ if (!isset($_SESSION["usuario"])) {
 include("conexao.php");
 include("permissoes.php"); // define ehAdmin() e as outras funções de categoria
 
-// Só administrador (categoria 1)
+// Só admi  nistrador (categoria 1)
 if (!ehAdmin()) {
     http_response_code(403);
     die("Acesso restrito ao administrador.");
