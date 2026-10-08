@@ -10,17 +10,21 @@ include("conexao.php");
 include("permissoes.php");
 include("relatorio_pdf.php");
 
-$busca      = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
-$filtro_emp = (isset($_GET["empresa_id"]) && is_numeric($_GET["empresa_id"])) ? (int)$_GET["empresa_id"] : 0;
+$busca = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
 
-// Expositor (e funcionário vinculado a uma empresa) só enxergam os cargos da própria empresa
-$empresaSessao = (int)($empresaLogadaId ?? 0);
-if (ehExpositor() && $empresaSessao <= 0) {
-    http_response_code(403);
-    exit("Usuário sem empresa vinculada.");
-}
-if (ehExpositor() || (ehFuncionario() && $empresaSessao > 0)) {
-    $filtro_emp = $empresaSessao;
+// Mesma regra da tela de cargos:
+// admin pode filtrar por empresa; os demais veem só a empresa da sessão
+$filtro_emp = 0;
+if (ehAdmin()) {
+    if (isset($_GET["empresa_id"]) && is_numeric($_GET["empresa_id"])) {
+        $filtro_emp = (int)$_GET["empresa_id"];
+    }
+} else {
+    $filtro_emp = (int)($empresaLogadaId ?? 0);
+    if ($filtro_emp <= 0) {
+        http_response_code(403);
+        exit("Usuário sem empresa vinculada.");
+    }
 }
 
 $condicoes = [];
@@ -33,20 +37,20 @@ if ($filtro_emp > 0) {
     $tipos      .= "i";
 }
 
+// A tela pesquisa só pelo nome do cargo
 if ($busca !== "") {
-    $condicoes[] = "(UPPER(C.NOME) LIKE UPPER(?) OR UPPER(E.NOME_FANTASIA) LIKE UPPER(?))";
-    $termo = "%" . $busca . "%";
-    array_push($params, $termo, $termo);
-    $tipos .= "ss";
+    $condicoes[] = "UPPER(C.NOME) LIKE UPPER(?)";
+    $params[]    = "%" . $busca . "%";
+    $tipos      .= "s";
 }
 
 $sql = "SELECT C.ID, C.NOME, E.NOME_FANTASIA
         FROM CARGOS C
-        LEFT JOIN EMPRESAS E ON E.ID = C.ID_EMPRESA";
+        INNER JOIN EMPRESAS E ON E.ID = C.ID_EMPRESA";
 if ($condicoes) {
     $sql .= " WHERE " . implode(" AND ", $condicoes);
 }
-$sql .= " ORDER BY C.ID DESC";
+$sql .= " ORDER BY E.NOME_FANTASIA, C.NOME";
 
 $stmt = $conn->prepare($sql);
 if ($params) {
@@ -55,13 +59,14 @@ if ($params) {
 $stmt->execute();
 $result = $stmt->get_result();
 
+// A coluna Empresa só aparece para o admin, como na tela
+$colunas = ehAdmin() ? ["ID", "Empresa", "Nome"] : ["ID", "Nome"];
+
 $linhas = [];
 while ($r = $result->fetch_assoc()) {
-    $linhas[] = [
-        $r["ID"],
-        $r["NOME"],
-        !empty($r["NOME_FANTASIA"]) ? $r["NOME_FANTASIA"] : "—",
-    ];
+    $linhas[] = ehAdmin()
+        ? [$r["ID"], $r["NOME_FANTASIA"], $r["NOME"]]
+        : [$r["ID"], $r["NOME"]];
 }
 
 // Texto do filtro aplicado
@@ -79,7 +84,7 @@ if ($busca !== "") {
 
 gerarRelatorioPdf(
     "Cargos",
-    ["ID", "Nome", "Empresa"],
+    $colunas,
     $linhas,
     implode(" | ", $partes),
     "relatorio_cargos.pdf"

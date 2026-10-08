@@ -147,11 +147,8 @@ include("cabecalho.php");
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="cargo_novo.php" class="botao">+ Novo Cargo</a>
+        <a href="relatorio_cargos.php?empresa_id=<?= $filtro_emp ?>&busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
     </div>
-
-         <a href="relatorio_empresas.php?busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
-
-
 
     <form method="GET" action="cargos.php" class="form-pesquisa">
 
@@ -213,4 +210,4 @@ include("cabecalho.php");
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
 <div class="contagem-registros"><?= $totalRegistros ?> cargo<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
-<?php include("rodape.php"); ?> 
+<?php include("rodape.php"); ?>
