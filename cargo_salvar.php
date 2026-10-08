@@ -18,14 +18,14 @@ if ($nome == "") {
 }
 
 if ($is_admin) {
-    // Admin escolhe a empresa pelo select
+   
     $empresa_id = intval($_POST["empresa_id"]);
 
     if ($empresa_id <= 0) {
         die("Selecione a empresa.");
     }
 } else {
-    // Funcionário/Expositor: empresa vem da sessão, não do POST
+
     $empresa_id = intval($_SESSION["empresa_id"]);
 
     if ($empresa_id <= 0) {

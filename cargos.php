@@ -29,7 +29,7 @@ if ($is_admin) {
         $tipos      .= "i";
     }
 } else {
-    // Funcionário e Expositor só veem os cargos da própria empresa
+  
     $condicoes[] = "C.ID_EMPRESA = ?";
     $params[]    = intval($_SESSION["empresa_id"]);
     $tipos      .= "i";
@@ -54,7 +54,7 @@ if (count($params) > 0) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Lista de empresas para o filtro (só admin usa)
+
 if ($is_admin) {
     $empresas = $conn->query("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE EXCLUIDO_EM IS NULL ORDER BY NOME_FANTASIA");
 }

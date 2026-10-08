@@ -1,5 +1,5 @@
 <?php
-// Grava a linha em logs/AAAA-MM/DD.log (cria as pastas se não existirem)
+
 function writeRegistroLog($linha)
 {
     try {
@@ -23,7 +23,7 @@ function writeRegistroLog($linha)
     }
 }
 
-// Transforma um registro (array) em "ID=1,NOME=Expositor,..."
+
 function dadosLog($registro)
 {
     $partes = [];
@@ -34,7 +34,7 @@ function dadosLog($registro)
     return implode(",", $partes);
 }
 
-// Busca um registro pelo ID (usado para guardar dados antigos/novos)
+
 function buscarRegistro($conn, $tabela, $id)
 {
     $stmt = $conn->prepare("SELECT * FROM $tabela WHERE ID = ?");
@@ -43,7 +43,7 @@ function buscarRegistro($conn, $tabela, $id)
     return $stmt->get_result()->fetch_assoc() ?: [];
 }
 
-// Monta a linha: usuario;OPERACAO;TELA;data;hora;dados
+
 function registrarLog($operacao, $tela, $dados = "")
 {
     $usuarioId = $_SESSION["usuario_id"] ?? 0;

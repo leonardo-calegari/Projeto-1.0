@@ -14,7 +14,7 @@ $is_admin     = ($categoria_id == 1);
 if ($is_admin) {
     $empresas = $conn->query("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE EXCLUIDO_EM IS NULL ORDER BY NOME_FANTASIA");
 } else {
-    // Empresa fixa, vinda da sessão
+   
     $stmt = $conn->prepare("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE ID = ?");
     $stmt->bind_param("i", $_SESSION["empresa_id"]);
     $stmt->execute();

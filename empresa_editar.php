@@ -111,7 +111,7 @@ function verificarTipo(select) {
     }
 }
 
-// ao carregar a página, verificar o tipo já selecionado
+
 window.onload = function() {
     var select = document.getElementById("tipo_id");
     if (select.value !== "") {

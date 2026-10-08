@@ -17,34 +17,40 @@ if (isset($_POST["entrar"])) {
     $email = trim(strip_tags($_POST["email"]));
     $senha = md5(trim($_POST["senha"]));
 
-    $stmt = $conn->prepare("SELECT * FROM USUARIOS WHERE EMAIL = ? AND SENHA = ?");
-    $stmt->bind_param("ss", $email, $senha);
+    // Busca o usuário só pelo e-mail; a senha é conferida depois, em PHP
+    $stmt = $conn->prepare("SELECT * FROM USUARIOS WHERE EMAIL = ?");
+    $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
+
+    $erro = "Email ou senha inválidos";
 
     if ($result && $result->num_rows == 1) {
         // chaves em minúsculo, para não depender de como a coluna foi criada
         $dados = array_change_key_case($result->fetch_assoc(), CASE_LOWER);
 
-        // 1 = administrador, 2 = funcionário, 3 = expositor
-        $categoria = (int)($dados["categoria_id"] ?? 0);
+        // Verificação da senha
+        if (hash_equals((string)$dados["senha"], $senha)) {
+            $erro = "";
 
-        session_regenerate_id(true);
+            // 1 = administrador, 2 = funcionário, 3 = expositor
+            $categoria = (int)($dados["categoria_id"] ?? 0);
 
-        $_SESSION["usuario"]      = $dados["nome"];
-        $_SESSION["usuario_id"]   = (int)$dados["id"];
-        $_SESSION["categoria_id"] = $categoria;
-        $_SESSION["empresa_id"]   = $dados["empresa_id"] ?? null;
+            session_regenerate_id(true);
 
-        if (function_exists("registrarLog")) {
-            registrarLog("LOGIN", "LOGIN", dadosLog(["EMAIL" => $email]));
+            $_SESSION["usuario"]      = $dados["nome"];
+            $_SESSION["usuario_id"]   = (int)$dados["id"];
+            $_SESSION["categoria_id"] = $categoria;
+            $_SESSION["empresa_id"]   = $dados["empresa_id"] ?? null;
+
+            if (function_exists("registrarLog")) {
+                registrarLog("LOGIN", "LOGIN", dadosLog(["EMAIL" => $email]));
+            }
+
+            header("Location: paginainicial.php");
+            exit;
         }
-
-        header("Location: paginainicial.php");
-        exit;
     }
-
-    $erro = "Email ou senha inválidos";
 }
 ?>
 <!DOCTYPE html>

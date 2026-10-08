@@ -30,10 +30,7 @@ function obterLimitePessoas($conn, $empresa_id)
     return ["total" => intval($total), "limite" => $limite];
 }
 
-/**
- * Verifica se a empresa atingiu o limite de pessoas.
- * limite = 0 é tratado como "sem limite" (nunca atinge).
- */
+
 function limiteAtingido($conn, $empresa_id)
 {
     $info = obterLimitePessoas($conn, $empresa_id);
@@ -45,11 +42,7 @@ function limiteAtingido($conn, $empresa_id)
     return $info["total"] >= $info["limite"];
 }
 
-/**
- * Valida um email/senha de usuário ADMIN (CATEGORIA_ID = 1).
- * Usado para liberar o cadastro além do limite quando quem está
- * inserindo é um usuário FUNCIONARIO (CATEGORIA_ID = 2).
- */
+
 function validarSenhaAdmin($conn, $email, $senha)
 {
     $email = trim(strip_tags($email));

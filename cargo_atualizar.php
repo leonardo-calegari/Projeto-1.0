@@ -22,7 +22,7 @@ if ($nome == "") {
     die("Preencha o nome do cargo.");
 }
 
-// Busca o cargo atual para validar a que empresa ele pertence
+
 $stmtAtual = $conn->prepare("SELECT ID_EMPRESA FROM CARGOS WHERE ID = ?");
 $stmtAtual->bind_param("i", $id);
 $stmtAtual->execute();
@@ -40,8 +40,7 @@ if ($is_admin) {
         die("Selecione a empresa.");
     }
 } else {
-    // Funcionário/Expositor só pode atualizar cargo da própria empresa,
-    // e a empresa do cargo não muda (vem sempre da sessão)
+
     if ($cargoAtual["ID_EMPRESA"] != intval($_SESSION["empresa_id"])) {
         die("Você não tem permissão para atualizar este cargo.");
     }

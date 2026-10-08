@@ -7,7 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 
 $usuario = htmlspecialchars($_SESSION["usuario"]);
 
-// Cada página pode definir $titulo_pagina antes de incluir este arquivo.
+
 if (!isset($titulo_pagina)) {
     $titulo_pagina = "Sistema de Credenciamento";
 }

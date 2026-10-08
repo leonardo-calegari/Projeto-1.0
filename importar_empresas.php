@@ -20,7 +20,7 @@ const ANO_FIXO = 2026;
 
 function importarEmpresas(mysqli $conn, string $caminho, int $usuarioId): array
 {
-    // 1) Tipos em um array: ID => nome em minúsculo
+    
     $nomesTipos = [];
     $rs = $conn->query("SELECT ID, NOME FROM TIPOS");
     while ($t = $rs->fetch_assoc()) {
@@ -55,7 +55,7 @@ function importarEmpresas(mysqli $conn, string $caminho, int $usuarioId): array
     $conn->begin_transaction();
     try {
         foreach ($linhas as $i => $linha) {
-            $numLinha = $i + 2; // +1 do cabeçalho, +1 porque começa em 1
+            $numLinha = $i + 2; 
             if (trim($linha) === "") continue;
 
             $c = explode(";", $linha);
@@ -63,20 +63,20 @@ function importarEmpresas(mysqli $conn, string $caminho, int $usuarioId): array
             $razao     = trim(strip_tags($c[$pos["RAZAO_SOCIAL"]] ?? ""));
             $tipoTexto = trim($c[$pos["TIPO_CADASTRO"]] ?? "");
 
-            // NOME_FANTASIA e TIPO_ID são NOT NULL no banco
+            
             if ($fantasia === "") {
                 $erros[] = "Linha $numLinha: nome fantasia vazio.";
                 continue;
             }
 
-            // Procura o ID do tipo pelo nome
+          
             $tipoId = array_search(mb_strtolower($tipoTexto, "UTF-8"), $nomesTipos, true);
             if ($tipoId === false) {
                 $erros[] = "Linha $numLinha ($fantasia): tipo '$tipoTexto' não encontrado.";
                 continue;
             }
 
-            $espacos = 0; // os tipos desta importação não controlam espaços
+            $espacos = 0; 
             $ano = ANO_FIXO;
             $stmt->bind_param("issii", $ano, $fantasia, $razao, $tipoId, $espacos);
             $stmt->execute();

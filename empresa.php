@@ -7,7 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
-include("permissoes.php"); // define $categoriaLogado e funções ehAdmin() etc.
+include("permissoes.php"); 
 
 $busca = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
 

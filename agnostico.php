@@ -1,5 +1,5 @@
 <?php
-// Arquivo TEMPORÁRIO de diagnóstico. Apague depois de usar.
+
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
 session_start();

@@ -18,7 +18,7 @@ if ($id <= 0) {
 }
 
 if (!$is_admin) {
-    // Funcionário/Expositor só pode excluir cargo da própria empresa
+    
     $stmtAtual = $conn->prepare("SELECT ID_EMPRESA FROM CARGOS WHERE ID = ?");
     $stmtAtual->bind_param("i", $id);
     $stmtAtual->execute();

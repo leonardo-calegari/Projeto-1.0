@@ -18,7 +18,7 @@ if ($nome_fantasia == "" || $razao_social == "" || $cnpj == "" || $tipo_id <= 0)
     die("Preencha todos os campos.");
 }
 
-// verificar se o tipo controla espaços
+
 $stmt_tipo = $conn->prepare("SELECT CONTROLA_ESPACOS FROM TIPOS WHERE ID = ?");
 $stmt_tipo->bind_param("i", $tipo_id);
 $stmt_tipo->execute();
