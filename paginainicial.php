@@ -65,6 +65,7 @@ aside a{
     color:#333;
     text-decoration:none;
     font-weight:bold;
+    /* sem text-transform: o texto aparece como escrito no HTML */
 }
 
 aside a:hover{
@@ -123,27 +124,18 @@ h1{
         <a href="cargos.php">cargos</a>
     </aside>
 
-    <main>
+    <main>  
 
-        <h1>Bem-vindo</h1>
+    <h1>Bem-vindo</h1>
 
-        <div class="botoes">
-            <a href="empresa_nova.php" class="botao">
-                Nova Empresa
-            </a>
-
-            <a href="pessoa_nova.php" class="botao">
-                Pessoa nova
-            </a>
-
-            <a href="cargo_novo.php" class="botao">
-                cargo novo
-            </a>
-        </div>
+    <div class="botoes">
+        <a href="empresa_nova.php" class="botao">Nova Empresa</a>
+        <a href="pessoa_nova.php" class="botao">Nova Pessoa</a>
+        <a href="cargo_novo.php" class="botao">Novo Cargo</a>
+        <a href="tipo_novo.php" class="botao">Novo Tipo</a>
+    </div>
 
     </main>
-
-</div>
 
 </body>
 
