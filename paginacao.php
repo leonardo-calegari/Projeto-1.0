@@ -1,11 +1,13 @@
 <?php
-// Paginação das listagens: 10 registros por página.
-//
-// Uso em cada tela:
-//   include("paginacao.php");                          (junto dos outros include)
-//   <?php $pg = prepararPaginacao($result); ?>         (depois do resultado da consulta, antes da tabela)
-//   <?php for ($i = 0; $i < $pg["limite"] && ($row = $result->fetch_assoc()); $i++) { ?>
-//   <?php exibirPaginacao($pg); ?>                     (logo depois do </table>)
+/*
+  Paginação das listagens: 10 registros por página.
+
+  Uso em cada tela:
+    include_once("paginacao.php");           // junto dos outros include
+    $pg = prepararPaginacao($result);        // depois da consulta, antes da tabela
+    for ($i = 0; $i < $pg["limite"] && ($row = $result->fetch_assoc()); $i++) { ... }
+    exibirPaginacao($pg);                    // logo depois do fechamento da tabela
+*/
 
 const REGISTROS_POR_PAGINA = 10;
 
