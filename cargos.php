@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("paginacao.php");
 
 $categoria_id = intval($_SESSION["categoria_id"]);
 $is_admin     = ($categoria_id == 1);
@@ -177,6 +178,7 @@ include("cabecalho.php");
 </div>
 
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
+<?php $pg = prepararPaginacao($result); ?>
 <div class="contagem-registros"><?= $totalRegistros ?> cargo<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
 <table>
@@ -188,7 +190,7 @@ include("cabecalho.php");
     </tr>
 
     <?php if ($result && $result->num_rows > 0) { ?>
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php for ($i = 0; $i < $pg["limite"] && ($row = $result->fetch_assoc()); $i++) { ?>
             <tr>
                 <td><?= htmlspecialchars($row["ID"]) ?></td>
                 <?php if ($is_admin) { ?><td><?= htmlspecialchars($row["NOME_FANTASIA"]) ?></td><?php } ?>
@@ -206,6 +208,8 @@ include("cabecalho.php");
     <?php } ?>
 
 </table>
+
+<?php exibirPaginacao($pg); ?>
 
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
 <div class="contagem-registros"><?= $totalRegistros ?> cargo<?= $totalRegistros == 1 ? "" : "s" ?></div>

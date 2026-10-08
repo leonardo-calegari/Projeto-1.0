@@ -8,6 +8,7 @@ if (!isset($_SESSION["usuario"])) {
 
 include("conexao.php");
 include("permissoes.php"); // define ehAdmin() e as outras funções de categoria
+include("paginacao.php");
 
 // Só administrador (categoria 1)
 if (!ehAdmin()) {
@@ -65,6 +66,7 @@ include("cabecalho.php");
 </div>
 
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
+<?php $pg = prepararPaginacao($result); ?>
 <div class="contagem-registros"><?= $totalRegistros ?> tipo<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
 <table>
@@ -76,7 +78,7 @@ include("cabecalho.php");
     </tr>
 
     <?php if ($result && $result->num_rows > 0) { ?>
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php for ($i = 0; $i < $pg["limite"] && ($row = $result->fetch_assoc()); $i++) { ?>
             <tr>
                 <td><?= htmlspecialchars($row["ID"]) ?></td>
                 <td><?= htmlspecialchars($row["NOME"]) ?></td>
@@ -94,5 +96,7 @@ include("cabecalho.php");
     <?php } ?>
 
 </table>
+
+<?php exibirPaginacao($pg); ?>
 
 <?php include("rodape.php"); ?>
