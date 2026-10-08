@@ -186,6 +186,7 @@ include("cabecalho.php");
         <?php } else { ?>
             <a class="botao" href="pessoa_nova.php?empresa_id=<?= $empresa_id ?>">+ Nova Pessoa</a>
         <?php } ?>
+        <a href="relatorio_pessoas_empresa.php?empresa_id=<?= $empresa_id ?>&busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
     </div>
 
     <form method="GET" action="pessoas_empresa.php" class="form-pesquisa">
