@@ -9,7 +9,7 @@ if (!isset($_SESSION["usuario"])) {
 include("conexao.php");
 include("permissoes.php"); // define ehAdmin() e as outras funções de categoria
 
-// Só admi  nistrador (categoria 1)
+// Só administrador (categoria 1)
 if (!ehAdmin()) {
     http_response_code(403);
     die("Acesso restrito ao administrador.");
@@ -60,6 +60,7 @@ include("cabecalho.php");
     <div class="grupo-esquerda">
         <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
         <a href="tipo_novo.php" class="botao">+ Novo Tipo</a>
+        <a href="relatorio_tipos.php" target="_blank" class="botao">Relatório</a>
     </div>
 </div>
 
