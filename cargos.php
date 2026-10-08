@@ -149,6 +149,10 @@ include("cabecalho.php");
         <a href="cargo_novo.php" class="botao">+ Novo Cargo</a>
     </div>
 
+         <a href="relatorio_empresas.php?busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
+
+
+
     <form method="GET" action="cargos.php" class="form-pesquisa">
 
         <?php if ($is_admin) { ?>
@@ -209,4 +213,4 @@ include("cabecalho.php");
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
 <div class="contagem-registros"><?= $totalRegistros ?> cargo<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
-<?php include("rodape.php"); ?>
+<?php include("rodape.php"); ?> 
