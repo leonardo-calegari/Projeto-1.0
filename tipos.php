@@ -6,44 +6,65 @@ if (!isset($_SESSION["usuario"])) {
     exit;
 }
 
-if (intval($_SESSION["categoria_id"] ?? 0) != 1) {
+include("conexao.php");
+include("permissoes.php"); // define ehAdmin() e as outras funções de categoria
+
+// Só administrador (categoria 1)
+if (!ehAdmin()) {
+    http_response_code(403);
     die("Acesso restrito ao administrador.");
 }
 
-include("conexao.php");
+$result = $conn->query("SELECT * FROM TIPOS ORDER BY ID DESC");
 
-$sql    = "SELECT * FROM TIPOS ORDER BY ID DESC";
-$result = $conn->query($sql);
+$titulo_pagina = "Tipos";
+include("cabecalho.php");
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-<meta charset="UTF-8">
-<title>Tipos</title>
 <style>
-*{ margin:0; padding:0; box-sizing:border-box; }
-body{ font-family:Arial,sans-serif; background:#f5f5f5; padding:40px; }
-h1{ margin-bottom:15px; }
-a{ color:#0d6efd; }
-table{ border-collapse:collapse; width:100%; background:#fff; margin-top:10px; }
-th, td{ border:1px solid #ddd; padding:10px; text-align:left; }
-th{ background:#f0f0f0; }
-.botao{ display:inline-block; padding:10px 16px; background:#0d6efd; color:white; text-decoration:none; border-radius:5px; margin-bottom:15px; }
-.botao:hover{ background:#0056d2; }
-.btn-voltar{ display:inline-block; padding:8px 16px; background:#6c757d; color:white; text-decoration:none; border-radius:5px; margin-bottom:20px; }
-.btn-voltar:hover{ background:#565e64; }
+.toolbar-lista {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0 24px;
+}
+.toolbar-lista .botao {
+    background: #2563eb;
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    border: none;
+}
+.toolbar-lista .botao:hover { background: #1d4ed8; }
+.toolbar-lista .grupo-esquerda {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.contagem-registros {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    margin: 8px 0;
+}
 </style>
-</head>
-
-<body>
 
 <h1>Tipos</h1>
 
-<a href="paginainicial.php" class="btn-voltar">← Voltar</a>
+<div class="toolbar-lista">
+    <div class="grupo-esquerda">
+        <a href="paginainicial.php" class="btn-voltar">← Voltar</a>
+        <a href="tipo_novo.php" class="botao">+ Novo Tipo</a>
+    </div>
+</div>
 
-<a href="tipo_novo.php" class="botao">+ Novo Tipo</a>
+<?php $totalRegistros = $result ? $result->num_rows : 0; ?>
+<div class="contagem-registros"><?= $totalRegistros ?> tipo<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
 <table>
     <tr>
@@ -73,5 +94,4 @@ th{ background:#f0f0f0; }
 
 </table>
 
-</body>
-</html>
+<?php include("rodape.php"); ?>

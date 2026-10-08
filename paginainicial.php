@@ -124,6 +124,7 @@ h1{
         <a href="cargos.php">Cargos</a>
         <?php if ($is_admin) { ?>
             <a href="tipos.php">Tipos</a>
+            <a href="logs.php">Logs</a>
         <?php } ?>
     </aside>
 
