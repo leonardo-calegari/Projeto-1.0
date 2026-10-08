@@ -21,9 +21,13 @@ $documento           = trim(strip_tags($_POST["documento"]));
 $telefone            = trim(strip_tags($_POST["telefone"]));
 $ingresso_permanente = trim(strip_tags($_POST["ingresso_permanente"]));
 
-// Funcionário/Expositor: a empresa é sempre a da sessão, nunca a enviada pelo formulário
-if (!$is_admin) {
-    $empresa_id = intval($_SESSION["empresa_id"]);
+// Expositor: a empresa é sempre a da sessão, nunca a enviada pelo formulário.
+// Funcionário vinculado a uma empresa também; sem vínculo, vale a empresa escolhida na tela de cadastro.
+$empresaSessao = intval($_SESSION["empresa_id"] ?? 0);
+if ($categoria_id == 3) {
+    $empresa_id = $empresaSessao;
+} elseif ($categoria_id == 2 && $empresaSessao > 0) {
+    $empresa_id = $empresaSessao;
 }
 
 if ($empresa_id <= 0 || $nome == "") {
