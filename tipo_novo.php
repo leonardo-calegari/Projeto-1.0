@@ -5,6 +5,10 @@ if (!isset($_SESSION["usuario"])) {
     header("Location: login.php");
     exit;
 }
+
+if (intval($_SESSION["categoria_id"] ?? 0) != 1) {
+    die("Acesso restrito ao administrador.");
+}
 ?>
 
 <!DOCTYPE html>

@@ -8,7 +8,7 @@ if (!isset($_SESSION["usuario"])) {
 
 include("conexao.php");
 
-$categoria_id = intval($_SESSION["categoria_id"]);
+$categoria_id = intval($_SESSION["categoria_id"] ?? 0);
 $is_admin     = ($categoria_id == 1);
 
 if ($is_admin) {
@@ -16,7 +16,8 @@ if ($is_admin) {
 } else {
    
     $stmt = $conn->prepare("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE ID = ?");
-    $stmt->bind_param("i", $_SESSION["empresa_id"]);
+    $empresa_id_sessao = intval($_SESSION["empresa_id"] ?? 0);
+    $stmt->bind_param("i", $empresa_id_sessao);
     $stmt->execute();
     $empresa_sessao = $stmt->get_result()->fetch_assoc();
 }
@@ -76,7 +77,7 @@ button:hover{ background:#0056d2; }
         </select>
     <?php } else { ?>
         <label>Empresa</label>
-        <input type="text" value="<?= htmlspecialchars($empresa_sessao["NOME_FANTASIA"]) ?>" disabled>
+        <input type="text" value="<?= htmlspecialchars($empresa_sessao["NOME_FANTASIA"] ?? "Sem empresa vinculada") ?>" disabled>
     <?php } ?>
 
     <label for="nome">Nome</label>

@@ -6,6 +6,10 @@ if (!isset($_SESSION["usuario"])) {
     exit;
 }
 
+if (intval($_SESSION["categoria_id"] ?? 0) != 1) {
+    die("Acesso restrito ao administrador.");
+}
+
 include("conexao.php");
 
 $sql    = "SELECT * FROM TIPOS ORDER BY ID DESC";

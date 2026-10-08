@@ -22,7 +22,6 @@ $tipos = $conn->query("SELECT ID, NOME, CONTROLA_ESPACOS FROM TIPOS ORDER BY NOM
 body{ font-family:Arial,sans-serif; background:#f5f5f5; padding:40px; }
 .container{ background:white; max-width:600px; padding:30px; border-radius:8px; }
 h1{ margin-bottom:15px; }
-.voltar{ color:#0d6efd; text-decoration:none; }
 form{ margin-top:20px; }
 label{ display:block; margin-top:15px; }
 input, select{ width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
@@ -94,4 +93,4 @@ function verificarTipo(select) {
 </script>
 
 </body>
-</html> 
+</html>

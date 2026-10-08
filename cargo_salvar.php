@@ -8,10 +8,10 @@ if (!isset($_SESSION["usuario"])) {
 
 include("conexao.php");
 
-$categoria_id = intval($_SESSION["categoria_id"]);
+$categoria_id = intval($_SESSION["categoria_id"] ?? 0);
 $is_admin     = ($categoria_id == 1);
 
-$nome = trim(strip_tags($_POST["nome"]));
+$nome = trim(strip_tags($_POST["nome"] ?? ""));
 
 if ($nome == "") {
     die("Preencha o nome do cargo.");
@@ -19,17 +19,17 @@ if ($nome == "") {
 
 if ($is_admin) {
    
-    $empresa_id = intval($_POST["empresa_id"]);
+    $empresa_id = intval($_POST["empresa_id"] ?? 0);
 
     if ($empresa_id <= 0) {
         die("Selecione a empresa.");
     }
 } else {
 
-    $empresa_id = intval($_SESSION["empresa_id"]);
+    $empresa_id = intval($_SESSION["empresa_id"] ?? 0);
 
     if ($empresa_id <= 0) {
-        die("Usuário sem empresa vinculada.");
+        die("Usuário sem empresa vinculada. Saia do sistema e entre novamente ou peça ao administrador para vincular uma empresa ao seu usuário.");
     }
 }
 

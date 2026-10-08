@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 $usuario = htmlspecialchars($_SESSION["usuario"]);
+$is_admin = intval($_SESSION["categoria_id"] ?? 0) == 1;
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +66,6 @@ aside a{
     color:#333;
     text-decoration:none;
     font-weight:bold;
-    /* sem text-transform: o texto aparece como escrito no HTML */
 }
 
 aside a:hover{
@@ -119,23 +119,41 @@ h1{
 <div class="layout">
 
     <aside>
-        <a href="empresa.php">EMPRESAS</a>
-        <a href="pessoas.php">PESSOAS</a>
-        <a href="cargos.php">cargos</a>
+        <a href="empresa.php">Empresas</a>
+        <a href="pessoas.php">Pessoas</a>
+        <a href="cargos.php">Cargos</a>
+        <?php if ($is_admin) { ?>
+            <a href="tipos.php">Tipos</a>
+        <?php } ?>
     </aside>
 
-    <main>  
+    <main>
 
-    <h1>Bem-vindo</h1>
+        <h1>Bem-vindo</h1>
 
-    <div class="botoes">
-        <a href="empresa_nova.php" class="botao">Nova Empresa</a>
-        <a href="pessoa_nova.php" class="botao">Nova Pessoa</a>
-        <a href="cargo_novo.php" class="botao">Novo Cargo</a>
-        <a href="tipo_novo.php" class="botao">Novo Tipo</a>
-    </div>
+        <div class="botoes">
+            <a href="empresa_nova.php" class="botao">
+                Nova Empresa
+            </a>
 
-    </main>
+                <a href="pessoa_nova.php" class="botao">
+                    Nova Pessoa
+                </a>
+
+                <a href="cargo_novo.php" class="botao">
+                    Novo Cargo
+                </a>
+
+                <?php if ($is_admin) { ?>
+                <a href="tipo_novo.php" class="botao">
+                    Novo Tipo
+                </a>
+                <?php } ?>
+            </div>
+
+        </main>
+
+</div>
 
 </body>
 

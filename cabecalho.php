@@ -114,11 +114,12 @@ th{ background:#f0f0f0; }
 <div class="layout">
 
     <aside>
-        <a href="empresa.php" class="<?= $pagina_atual === 'empresa.php' ? 'ativo' : '' ?>">EMPRESAS</a>
-        <a href="pessoas.php" class="<?= $pagina_atual === 'pessoas.php' ? 'ativo' : '' ?>">PESSOAS</a>
-        <a href="cargos.php" class="<?= $pagina_atual === 'cargos.php' ? 'ativo' : '' ?>">CARGOS</a>
-        <?php if (($_SESSION["perfil"] ?? "") === "admin") { ?>
-        <a href="logs.php" class="<?= $pagina_atual === 'logs.php' ? 'ativo' : '' ?>">LOGS</a>
+        <a href="empresa.php" class="<?= $pagina_atual === 'empresa.php' ? 'ativo' : '' ?>">Empresas</a>
+        <a href="pessoas.php" class="<?= $pagina_atual === 'pessoas.php' ? 'ativo' : '' ?>">Pessoas</a>
+        <a href="cargos.php" class="<?= $pagina_atual === 'cargos.php' ? 'ativo' : '' ?>">Cargos</a>
+        <?php if (intval($_SESSION["categoria_id"] ?? 0) == 1) { ?>
+        <a href="tipos.php" class="<?= $pagina_atual === 'tipos.php' ? 'ativo' : '' ?>">Tipos</a>
+        <a href="logs.php" class="<?= $pagina_atual === 'logs.php' ? 'ativo' : '' ?>">Logs</a>
         <?php } ?>
     </aside>
 

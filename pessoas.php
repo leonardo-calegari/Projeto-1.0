@@ -170,7 +170,9 @@ include("cabecalho.php");
 
         <a class="botao" href="pessoa_nova.php<?= $filtro_emp > 0 ? '?empresa_id=' . $filtro_emp : '' ?>">+ Nova Pessoa</a>
 
-<a href="importar_pessoas.php?empresa_id=<?= $row["ID"] ?>" class="botao-tabela">Importar pessoas</a> |
+<?php if ($filtro_emp > 0) { ?>
+            <a href="importar_pessoas.php?empresa_id=<?= $filtro_emp ?>" class="botao">Importar pessoas</a>
+        <?php } ?>
 
 <a href="relatorio_pessoas.php?empresa_id=<?= $filtro_emp ?>&busca=<?= urlencode($busca) ?>" target="_blank" class="botao">Relatório</a>
 

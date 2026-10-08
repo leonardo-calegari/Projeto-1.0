@@ -6,11 +6,15 @@ if (!isset($_SESSION["usuario"])) {
     exit;
 }
 
+if (intval($_SESSION["categoria_id"] ?? 0) != 1) {
+    die("Acesso restrito ao administrador.");
+}
+
 include("conexao.php");
 include("funcoes_log.php");
 
-$nome             = trim(strip_tags($_POST["nome"]));
-$controla_espacos = trim(strip_tags($_POST["controla_espacos"]));
+$nome             = trim(strip_tags($_POST["nome"] ?? ""));
+$controla_espacos = trim(strip_tags($_POST["controla_espacos"] ?? ""));
 
 if ($nome == "") {
     die("Preencha o nome do tipo.");

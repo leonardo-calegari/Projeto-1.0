@@ -5,7 +5,7 @@ include("funcoes_log.php");
 
 // Já está logado (com categoria na sessão): vai direto para a página inicial.
 // Sessões antigas, sem categoria, caem no formulário para entrar de novo.
-if (isset($_SESSION["usuario"]) && (int)($_SESSION["categoria_id"] ?? 0) > 0) {
+if (isset($_SESSION["usuario"]) && (int)($_SESSION["categoria_id"] ?? 0) > 0 && isset($_SESSION["empresa_id"])) {
     header("Location: paginainicial.php");
     exit;
 }
@@ -41,7 +41,7 @@ if (isset($_POST["entrar"])) {
             $_SESSION["usuario"]      = $dados["nome"];
             $_SESSION["usuario_id"]   = (int)$dados["id"];
             $_SESSION["categoria_id"] = $categoria;
-            $_SESSION["empresa_id"]   = $dados["empresa_id"] ?? null;
+            $_SESSION["empresa_id"] = intval($dados["empresa_id"] ?? 0);
 
             if (function_exists("registrarLog")) {
                 registrarLog("LOGIN", "LOGIN", dadosLog(["EMAIL" => $email]));

@@ -22,7 +22,11 @@ $empresa_id = (int) $_GET["empresa_id"];
 // Funcionário/Expositor só podem ver a própria empresa,
 // mesmo que tentem trocar o empresa_id na URL
 if (!$is_admin) {
-    $empresa_id = intval($_SESSION["empresa_id"]);
+    $empresa_id = intval($_SESSION["empresa_id"] ?? 0);
+
+    if ($empresa_id <= 0) {
+        die("Usuário sem empresa vinculada. Saia do sistema e entre novamente ou peça ao administrador para vincular uma empresa ao seu usuário.");
+    }
 }
 
 $stmtEmpresa = $conn->prepare("SELECT * FROM EMPRESAS WHERE ID = ?");
@@ -54,7 +58,7 @@ if ($busca !== "") {
         ORDER BY P.ID DESC";
     $stmt  = $conn->prepare($sql);
     $termo = "%" . $busca . "%";
-    $stmt->bind_param("isss", $empresa_id, $termo, $termo, $termo, $termo);
+    $stmt->bind_param("issss", $empresa_id, $termo, $termo, $termo, $termo);
     $stmt->execute();
     $result = $stmt->get_result();
 } else {
