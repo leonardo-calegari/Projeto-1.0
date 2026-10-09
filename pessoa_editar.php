@@ -172,5 +172,7 @@ function atualizarCargos(empresaId) {
 <?php } ?>
 </script>
 
+<script src="js/validacao.js"></script>
+
 </body>
 </html>

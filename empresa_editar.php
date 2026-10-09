@@ -121,5 +121,7 @@ window.onload = function() {
 };
 </script>
 
+<script src="js/validacao.js"></script>
+
 </body>
 </html>

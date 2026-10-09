@@ -93,5 +93,7 @@ function verificarTipo(select) {
 }
 </script>
 
+<script src="js/validacao.js"></script>
+
 </body>
 </html>

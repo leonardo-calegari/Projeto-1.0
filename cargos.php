@@ -211,6 +211,8 @@ include("cabecalho.php");
 
 <?php exibirPaginacao($pg); ?>
 
+<script src="js/filtro_tabela.js"></script>
+
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
 <div class="contagem-registros"><?= $totalRegistros ?> cargo<?= $totalRegistros == 1 ? "" : "s" ?></div>
 

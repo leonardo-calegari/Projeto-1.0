@@ -252,4 +252,6 @@ include("cabecalho.php");
 
 <?php exibirPaginacao($pg); ?>
 
+<script src="js/filtro_tabela.js"></script>
+
 <?php include("rodape.php"); ?>
