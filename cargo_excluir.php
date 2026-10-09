@@ -9,9 +9,12 @@ if (!isset($_SESSION["usuario"])) {
 include("conexao.php");
 
 $categoria_id = intval($_SESSION["categoria_id"]);
-$is_admin     = ($categoria_id == 1);
+// Administrador (e funcionário sem empresa vinculada) escolhem a empresa.
+// Expositor e funcionário vinculado usam sempre a empresa da sessão.
+$empresa_id_sessao = intval($_SESSION["empresa_id"] ?? 0);
+$is_admin = ($categoria_id == 1) || ($categoria_id == 2 && $empresa_id_sessao <= 0);
 
-$id = intval($_GET["id"]);
+$id = intval($_GET["id"] ?? 0);
 
 if ($id <= 0) {
     die("ID inválido.");
