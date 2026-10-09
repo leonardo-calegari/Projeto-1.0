@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("config.php");
 
 $id = intval($_GET["id"]);
 
@@ -69,7 +70,7 @@ button:hover{ background:#0056d2; }
     <input type="text" id="razao_social" name="razao_social" value="<?= htmlspecialchars($empresa["RAZAO_SOCIAL"]) ?>" required>
 
     <label for="cnpj">CNPJ</label>
-    <input type="text" id="cnpj" name="cnpj" value="<?= htmlspecialchars($empresa["CNPJ"]) ?>" required>
+    <input type="text" id="cnpj" name="cnpj" value="<?= htmlspecialchars($empresa["CNPJ"] ?? "") ?>" <?= CNPJ_OBRIGATORIO ? "required" : "" ?>>
 
     <label for="tipo_id">Tipo</label>
     <select id="tipo_id" name="tipo_id" required onchange="verificarTipo(this)">
@@ -85,7 +86,7 @@ button:hover{ background:#0056d2; }
 
     <div id="campo_espacos" style="display:none;">
         <label for="quantidade_espacos">Quantidade de Espaços</label>
-        <input type="number" id="quantidade_espacos" name="quantidade_espacos" min="0" value="<?= htmlspecialchars($empresa["QUANTIDADE_ESPACOS"]) ?>">
+        <input type="number" id="quantidade_espacos" name="quantidade_espacos" min="0" value="<?= htmlspecialchars($empresa["QUANTIDADE_ESPACOS"] ?? "") ?>">
     </div>
 
     <button type="submit">Atualizar</button>

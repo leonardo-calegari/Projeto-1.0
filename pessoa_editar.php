@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("config.php");
 
 $categoria_id = intval($_SESSION["categoria_id"]);
 $is_admin     = ($categoria_id == 1);
@@ -122,13 +123,13 @@ button:hover{ background:#0056d2; }
     <input type="text" id="nome" name="nome" value="<?= htmlspecialchars($pessoa["NOME"]) ?>" required>
 
     <label for="cpf">CPF</label>
-    <input type="text" id="cpf" name="cpf" value="<?= htmlspecialchars($pessoa["CPF"]) ?>" maxlength="11">
+    <input type="text" id="cpf" name="cpf" value="<?= htmlspecialchars($pessoa["CPF"] ?? "") ?>" maxlength="11" <?= campoPessoaObrigatorio("cpf") ? "required" : "" ?>>
 
     <label for="documento">Documento</label>
-    <input type="text" id="documento" name="documento" value="<?= htmlspecialchars($pessoa["DOCUMENTO"]) ?>" maxlength="30">
+    <input type="text" id="documento" name="documento" value="<?= htmlspecialchars($pessoa["DOCUMENTO"] ?? "") ?>" maxlength="30" <?= campoPessoaObrigatorio("documento") ? "required" : "" ?>>
 
     <label for="telefone">Telefone</label>
-    <input type="text" id="telefone" name="telefone" value="<?= htmlspecialchars($pessoa["TELEFONE"]) ?>" maxlength="14">
+    <input type="text" id="telefone" name="telefone" value="<?= htmlspecialchars($pessoa["TELEFONE"] ?? "") ?>" maxlength="14">
 
     <label for="ingresso_permanente">Ingresso Permanente</label>
     <select id="ingresso_permanente" name="ingresso_permanente" required>

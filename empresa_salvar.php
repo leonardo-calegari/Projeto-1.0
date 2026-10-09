@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("config.php");
 
 $nome_fantasia = trim(strip_tags($_POST["nome_fantasia"]));
 $razao_social  = trim(strip_tags($_POST["razao_social"]));
@@ -14,15 +15,25 @@ $cnpj          = trim(strip_tags($_POST["cnpj"]));
 $tipo_id       = intval($_POST["tipo_id"]);
 $ano           = 2026;
 
-if ($nome_fantasia == "" || $razao_social == "" || $cnpj == "" || $tipo_id <= 0) {
+if ($nome_fantasia == "" || $razao_social == "" || $tipo_id <= 0) {
     die("Preencha todos os campos.");
 }
+
+// O CNPJ só é obrigatório se estiver assim em config.php
+if (CNPJ_OBRIGATORIO && $cnpj == "") {
+    die("O CNPJ é obrigatório.");
+}
+$cnpj = ($cnpj === "") ? null : $cnpj;
 
 
 $stmt_tipo = $conn->prepare("SELECT CONTROLA_ESPACOS FROM TIPOS WHERE ID = ?");
 $stmt_tipo->bind_param("i", $tipo_id);
 $stmt_tipo->execute();
 $res_tipo = $stmt_tipo->get_result()->fetch_assoc();
+
+if (!$res_tipo) {
+    die("Tipo inválido.");
+}
 
 if ($res_tipo["CONTROLA_ESPACOS"] === "S") {
     $quantidade_espacos = intval($_POST["quantidade_espacos"]);

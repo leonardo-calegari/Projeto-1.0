@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("paginacao.php");
 
 $categoria_id = intval($_SESSION["categoria_id"]);
 $is_admin     = ($categoria_id == 1);
@@ -202,6 +203,7 @@ include("cabecalho.php");
 </div>
 
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
+<?php $pg = prepararPaginacao($result); ?>
 <div class="contagem-registros"><?= $totalRegistros ?> pessoa<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
 <table>
@@ -218,7 +220,7 @@ include("cabecalho.php");
     </tr>
 
     <?php if ($result && $result->num_rows > 0) { ?>
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php for ($i = 0; $i < $pg["limite"] && ($row = $result->fetch_assoc()); $i++) { ?>
             <tr>
                 <td><?= htmlspecialchars($row["ID"]) ?></td>
                 <td class="col-foto">
@@ -231,8 +233,8 @@ include("cabecalho.php");
                 <td><?= htmlspecialchars($row["NOME"]) ?></td>
                 <td><?= htmlspecialchars($row["NOME_FANTASIA"]) ?></td>
                 <td><?= !empty($row["NOME_CARGO"]) ? htmlspecialchars($row["NOME_CARGO"]) : "—" ?></td>
-                <td><?= htmlspecialchars($row["CPF"]) ?></td>
-                <td><?= htmlspecialchars($row["TELEFONE"]) ?></td>
+                <td><?= htmlspecialchars($row["CPF"] ?? "") ?></td>
+                <td><?= htmlspecialchars($row["TELEFONE"] ?? "") ?></td>
                 <td><?= htmlspecialchars($row["INGRESSO_PERMANENTE"]) ?></td>
                 <td>
                     <a href="pessoa_editar.php?id=<?= $row["ID"] ?>">Editar</a> |
@@ -247,5 +249,7 @@ include("cabecalho.php");
     <?php } ?>
 
 </table>
+
+<?php exibirPaginacao($pg); ?>
 
 <?php include("rodape.php"); ?>

@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("config.php");
 
 $tipos = $conn->query("SELECT ID, NOME, CONTROLA_ESPACOS FROM TIPOS ORDER BY NOME");
 ?>
@@ -51,7 +52,7 @@ button:hover{ background:#0056d2; }
     <input type="text" id="razao_social" name="razao_social" required>
 
     <label for="cnpj">CNPJ</label>
-    <input type="text" id="cnpj" name="cnpj" maxlength="14" required>
+    <input type="text" id="cnpj" name="cnpj" maxlength="14" <?= CNPJ_OBRIGATORIO ? "required" : "" ?>>
 
     <label for="tipo_id">Tipo</label>
     <select id="tipo_id" name="tipo_id" required onchange="verificarTipo(this)">

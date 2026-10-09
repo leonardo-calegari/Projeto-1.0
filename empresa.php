@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("paginacao.php");
 include("permissoes.php"); 
 
 $busca = isset($_GET["busca"]) ? trim($_GET["busca"]) : "";
@@ -131,6 +132,7 @@ include("cabecalho.php");
 </div>
 
 <?php $totalRegistros = $result ? $result->num_rows : 0; ?>
+<?php $pg = prepararPaginacao($result); ?>
 <div class="contagem-registros"><?= $totalRegistros ?> registro<?= $totalRegistros == 1 ? "" : "s" ?></div>
 
 <table>
@@ -143,12 +145,12 @@ include("cabecalho.php");
     </tr>
 
     <?php if ($result && $result->num_rows > 0) { ?>
-        <?php while ($row = $result->fetch_assoc()) { ?>
+        <?php for ($i = 0; $i < $pg["limite"] && ($row = $result->fetch_assoc()); $i++) { ?>
             <tr>
                 <td><?= htmlspecialchars($row["ID"]) ?></td>
                 <td><?= htmlspecialchars($row["NOME_FANTASIA"]) ?></td>
                 <td><?= htmlspecialchars($row["RAZAO_SOCIAL"]) ?></td>
-                <td><?= htmlspecialchars($row["CNPJ"]) ?></td>
+                <td><?= htmlspecialchars($row["CNPJ"] ?? "") ?></td>
                 <td>
                     <a href="empresa_editar.php?id=<?= $row["ID"] ?>">Editar</a> |
                     <a href="pessoas_empresa.php?empresa_id=<?= $row["ID"] ?>">Usuários</a> |
@@ -164,5 +166,7 @@ include("cabecalho.php");
     <?php } ?>
 
 </table>
+
+<?php exibirPaginacao($pg); ?>
 
 <?php include("rodape.php"); ?>

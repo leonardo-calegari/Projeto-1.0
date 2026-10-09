@@ -7,6 +7,7 @@ if (!isset($_SESSION["usuario"])) {
 }
 
 include("conexao.php");
+include("config.php");
 include("funcoes_upload.php");
 
 $categoria_id = intval($_SESSION["categoria_id"]);
@@ -47,6 +48,14 @@ if (!$is_admin) {
 
 if ($empresa_id <= 0 || $nome == "") {
     die("Preencha os campos obrigatórios.");
+}
+
+// CPF e documento: obrigatórios conforme config.php
+if (campoPessoaObrigatorio("cpf") && $cpf == "") {
+    die("O CPF é obrigatório.");
+}
+if (campoPessoaObrigatorio("documento") && $documento == "") {
+    die("O documento é obrigatório.");
 }
 
 if (!in_array($ingresso_permanente, ["S", "N"])) {
