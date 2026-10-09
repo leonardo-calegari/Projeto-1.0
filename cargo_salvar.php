@@ -9,7 +9,10 @@ if (!isset($_SESSION["usuario"])) {
 include("conexao.php");
 
 $categoria_id = intval($_SESSION["categoria_id"] ?? 0);
-$is_admin     = ($categoria_id == 1);
+// Administrador (e funcionário sem empresa vinculada) escolhem a empresa.
+// Expositor e funcionário vinculado usam sempre a empresa da sessão.
+$empresa_id_sessao = intval($_SESSION["empresa_id"] ?? 0);
+$is_admin = ($categoria_id == 1) || ($categoria_id == 2 && $empresa_id_sessao <= 0);
 
 $nome = trim(strip_tags($_POST["nome"] ?? ""));
 
@@ -23,6 +26,13 @@ if ($is_admin) {
 
     if ($empresa_id <= 0) {
         die("Selecione a empresa.");
+    }
+
+    $chk = $conn->prepare("SELECT ID FROM EMPRESAS WHERE ID = ? AND EXCLUIDO_EM IS NULL");
+    $chk->bind_param("i", $empresa_id);
+    $chk->execute();
+    if ($chk->get_result()->num_rows == 0) {
+        die("Empresa inválida.");
     }
 } else {
 

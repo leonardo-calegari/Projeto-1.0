@@ -9,17 +9,23 @@ if (!isset($_SESSION["usuario"])) {
 include("conexao.php");
 
 $categoria_id = intval($_SESSION["categoria_id"] ?? 0);
-$is_admin     = ($categoria_id == 1);
+// Administrador (e funcionário sem empresa vinculada) escolhem a empresa.
+// Expositor e funcionário vinculado usam sempre a empresa da sessão.
+$empresa_id_sessao = intval($_SESSION["empresa_id"] ?? 0);
+$is_admin = ($categoria_id == 1) || ($categoria_id == 2 && $empresa_id_sessao <= 0);
 
 if ($is_admin) {
     $empresas = $conn->query("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE EXCLUIDO_EM IS NULL ORDER BY NOME_FANTASIA");
 } else {
    
     $stmt = $conn->prepare("SELECT ID, NOME_FANTASIA FROM EMPRESAS WHERE ID = ?");
-    $empresa_id_sessao = intval($_SESSION["empresa_id"] ?? 0);
     $stmt->bind_param("i", $empresa_id_sessao);
     $stmt->execute();
     $empresa_sessao = $stmt->get_result()->fetch_assoc();
+
+    if (!$empresa_sessao) {
+        die("Seu usuário não está vinculado a uma empresa. Peça ao administrador para vincular uma empresa ao seu usuário.");
+    }
 }
 ?>
 
