@@ -176,23 +176,13 @@ if (!$fotoOk) {
 imagerectangle($img, $fx, $fy, $fx + $fw, $fy + $fh, $cinza);
 
 // QR Code
-if (class_exists(\chillerlan\QRCode\Output\QROutputInterface::class)) {
-    // Versão 5 da biblioteca
-    $opcoes = new QROptions([
-        "outputType"  => \chillerlan\QRCode\Output\QROutputInterface::GDIMAGE_PNG,
-        "eccLevel"    => \chillerlan\QRCode\Common\EccLevel::M,
-        "scale"       => 10,
-        "imageBase64" => false,
-    ]);
-} else {
-    // Versão 4 da biblioteca
-    $opcoes = new QROptions([
-        "outputType"  => QRCode::OUTPUT_IMAGE_PNG,
-        "eccLevel"    => QRCode::ECC_M,
-        "scale"       => 10,
-        "imageBase64" => false,
-    ]);
-}
+// "png" e 0 (nível de correção M) valem tanto na versão 4 quanto na 5 da biblioteca
+$opcoes = new QROptions([
+    "outputType"  => "png",
+    "eccLevel"    => 0,
+    "scale"       => 10,
+    "imageBase64" => false,
+]);
 $saida = (new QRCode($opcoes))->render($codigo);
 if (strpos($saida, "data:") === 0) {
     $saida = base64_decode(substr($saida, strpos($saida, ",") + 1));
